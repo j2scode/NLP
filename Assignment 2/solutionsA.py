@@ -101,6 +101,54 @@ def q1_output(unigrams, bigrams, trigrams, filename):
 # This function must return a python list of scores, where the first element is the score of the first sentence, etc. 
 def score(ngram_p, n, corpus):
     scores = []
+
+    # Score sentence with unigram
+    if n == 1:
+        for sentence in corpus:
+            tokens = sentence.strip().split()
+            tokens.append(STOP_SYMBOL)
+            prob = 0.0
+            for token in tokens:
+                token = (token,)
+                if ngram_p.has_key(token):
+                    prob = prob + ngram_p[token]
+                else:
+                    prob = MINUS_INFINITY_SENTENCE_LOG_PROB
+                    break
+            scores.append(prob)
+
+    # Score sentence with bigrams
+    if n == 2:
+        for sentence in corpus:
+            prob = 0.0
+            tokens = sentence.strip().split()
+            tokens.insert(0, START_SYMBOL)
+            tokens.append(STOP_SYMBOL)
+            bigrams = tuple(nltk.bigrams(tokens))
+            for bigram in bigrams:
+                if ngram_p.has_key(bigram):
+                    prob = prob + ngram_p[bigram]
+                else:
+                    prob = MINUS_INFINITY_SENTENCE_LOG_PROB
+                    break
+            scores.append(prob)
+
+    # Score sentence with trigrams
+    if n == 3:
+        for sentence in corpus:
+            prob = 0.0
+            tokens = sentence.strip().split()
+            tokens.insert(0, START_SYMBOL)
+            tokens.insert(0, START_SYMBOL)
+            tokens.append(STOP_SYMBOL)
+            trigrams = tuple(nltk.trigrams(tokens))
+            for trigram in trigrams:
+                if ngram_p.has_key(trigram):
+                    prob = prob + ngram_p[trigram]
+                else:
+                    prob = MINUS_INFINITY_SENTENCE_LOG_PROB
+                    break
+            scores.append(prob)
     return scores
 
 # Outputs a score to a file

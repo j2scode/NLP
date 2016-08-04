@@ -12,9 +12,52 @@ MINUS_INFINITY_SENTENCE_LOG_PROB = -1000
 # training_corpus: is a list of the sentences. Each sentence is a string with tokens separated by spaces, ending in a newline character.
 # This function outputs three python dictionaries, where the keys are tuples expressing the ngram and the value is the log probability of that ngram
 def calc_probabilities(training_corpus):
+
+    from nltk.tokenize import RegexpTokenizer
+
     unigram_p = {}
     bigram_p = {}
     trigram_p = {}
+
+    unigram = {}
+    bigram = {}
+    trigram = {}
+
+    # Create unigram, bigram and trigrams
+    print "Starting sentence parsing"
+    s = 0
+    for sentence in training_corpus:
+        s += 1
+
+        # Create unigram and bigram/trigram tokens
+        tokens = nltk.word_tokenize(sentence)
+
+        # Build Unigram Dictionary
+        tokens = tokens + [STOP_SYMBOL]
+        for word in tokens:
+            if word in unigram:
+                unigram[word] += 1
+            else:
+                unigram[word] = 1
+
+        #bigram = bigram + list(nltk.bigrams(tokens_multi))
+        #trigram = trigram + list(nltk.trigrams(tokens_multi))
+    print "Done sentence parsing, processed ", s, " sentences and ", len(unigram), " unigrams"
+
+    # Calculate probabilities
+    print "Calculating unigram percentage."
+    word_count = sum(unigram.itervalues())
+    print "word count is ", word_count
+    for word in unigram:
+        unigram_p[tuple([word])] = math.log(unigram[word] / float(word_count), 2)
+
+    #print "Calculating bigram percentage."
+    #bigram_p = {item: math.log((bigram.count(item) / float(len(list(bigram)))), 2) for item in
+    #                set(bigram)}
+    #print "Calculating trigram percentage."
+    #trigram_p = {item: math.log((trigram.count(item) / float(len(list(trigram)))), 2) for item in
+    #                 set(trigram)}
+
     return unigram_p, bigram_p, trigram_p
 
 # Prints the output for q1

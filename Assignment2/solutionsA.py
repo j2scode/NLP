@@ -19,44 +19,54 @@ def calc_probabilities(training_corpus):
     bigram_p = {}
     trigram_p = {}
 
-    unigram = {}
-    bigram = {}
-    trigram = {}
+    unigrams = {}
+    bigrams = {}
+    trigrams = {}
 
     # Create unigram, bigram and trigrams
-    print "Starting sentence parsing"
-    s = 0
     for sentence in training_corpus:
-        s += 1
 
-        # Create unigram and bigram/trigram tokens
+        # Create token
         tokens = nltk.word_tokenize(sentence)
 
         # Build Unigram Dictionary
         tokens = tokens + [STOP_SYMBOL]
         for word in tokens:
-            if word in unigram:
-                unigram[word] += 1
+            if word in unigrams:
+                unigrams[word] += 1
             else:
-                unigram[word] = 1
+                unigrams[word] = 1
 
-        #bigram = bigram + list(nltk.bigrams(tokens_multi))
-        #trigram = trigram + list(nltk.trigrams(tokens_multi))
-    print "Done sentence parsing, processed ", s, " sentences and ", len(unigram), " unigrams"
+        # Build Bigram Dictionary
+        tokens = [START_SYMBOL] + tokens
+        bigram_tuples = tuple(nltk.bigrams(tokens))
+        for bigram in bigram_tuples:
+            if bigram in bigrams:
+                bigrams[bigram] += 1
+            else:
+                bigrams[bigram] = 1
 
-    # Calculate probabilities
-    print "Calculating unigram percentage."
-    word_count = sum(unigram.itervalues())
-    print "word count is ", word_count
-    for word in unigram:
-        unigram_p[tuple([word])] = math.log(unigram[word] / float(word_count), 2)
+        # Build Trigram Dictionary
+        tokens = [START_SYMBOL] + tokens
+        trigram_tuples = tuple(nltk.trigrams(tokens))
+        for trigram in trigram_tuples:
+            if trigram in trigrams:
+                trigrams[trigram] += 1
+            else:
+                trigrams[trigram] = 1
 
-    #print "Calculating bigram percentage."
-    #bigram_p = {item: math.log((bigram.count(item) / float(len(list(bigram)))), 2) for item in
-    #                set(bigram)}
-    #print "Calculating trigram percentage."
-    #trigram_p = {item: math.log((trigram.count(item) / float(len(list(trigram)))), 2) for item in
-    #                 set(trigram)}
+
+    # Calculate Unigram Probabilities
+    word_count = sum(unigrams.itervalues())
+    unigram_p = {tuple([unigram]): math.log(count / float(word_count), 2) for unigram, count in unigrams.iteritems()}
+
+    # Calculate Bigram Probabilities
+    unigrams[START_SYMBOL] = len(training_corpus)
+    bigram_p = {bigram: math.log(float(count) / unigrams[bigram[0]], 2) for bigram, count in bigrams.iteritems()}
+
+    # Calculate Trigram Probabilities
+    bigrams[(START_SYMBOL, START_SYMBOL)] = len(training_corpus)
+    trigram_p = {trigram: math.log(float(count) / bigrams[trigram[:2]], 2) for trigram, count in trigrams.iteritems()}
 
     return unigram_p, bigram_p, trigram_p
 

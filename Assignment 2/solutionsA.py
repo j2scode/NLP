@@ -26,8 +26,8 @@ def calc_probabilities(training_corpus):
     # Create unigram, bigram and trigrams
     for sentence in training_corpus:
 
-        # Create token
-        tokens = nltk.word_tokenize(sentence)
+        # Create tokens
+        tokens = sentence.strip().split()
 
         # Build Unigram Dictionary
         tokens = tokens + [STOP_SYMBOL]
@@ -55,13 +55,12 @@ def calc_probabilities(training_corpus):
             else:
                 trigrams[trigram] = 1
 
-
     # Calculate Unigram Probabilities
     word_count = sum(unigrams.itervalues())
-    unigram_p = {tuple([unigram]): math.log(count / float(word_count), 2) for unigram, count in unigrams.iteritems()}
+    unigram_p = {tuple([unigram]): math.log(float(count) / word_count, 2) for unigram, count in unigrams.iteritems()}
 
     # Calculate Bigram Probabilities
-    unigrams[START_SYMBOL] = len(training_corpus)
+    unigrams[(START_SYMBOL)] = len(training_corpus)
     bigram_p = {bigram: math.log(float(count) / unigrams[bigram[0]], 2) for bigram, count in bigrams.iteritems()}
 
     # Calculate Trigram Probabilities

@@ -12,6 +12,7 @@ Combined with treebank-induced classifiers, memory based learners or support vec
 
 ## Project Overview
 This project examines the performance accuracy and complexity of Joakim Nivre’s Arc-Eager Transition-Based Dependency Parser (AE), one of the most widely used dependency parsers.  Danish, English, and Swedish training and test data sets were provided by the CoNLL-X shared task on multilingual dependency parsing.  The CoNLL data format is a tab-separated text file, where the ten fields were: 
+
 1. ID - a token counter, which restarts at 1 for each new sentence 
 2. FORM - the word form, or a punctuation symbol 
 3. LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 

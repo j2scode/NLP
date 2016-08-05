@@ -6,6 +6,7 @@ Transition-based dependency parsing models the parsing problem as a series of de
 -	Buffer - an input buffer containing all the unprocessed words in a sentence
 -	Stack – holding all the partially processed words in a sentence
 -	Arc Set – a set of head and dependent arcs, along with a dependency label, that defines the current tree
+
 The objective of the parser is to determine the “transitions” to move from an initial configuration, an unprocessed sentence, to a terminal configuration in which the sentence is processed and the Arc Set contains all dependencies from which a dependence graph can be rendered.  The challenge is to determine which action or transition should be taken in each of the unboundedly many states encountered as the parser progresses.  
 
 Combined with treebank-induced classifiers, memory based learners or support vector machines, dependency parsing algorithms can be used to create accurate disambiguating parsers, in particular for dependency-based syntactic representations. 

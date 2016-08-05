@@ -54,7 +54,6 @@ To improve performance, six new features were introduced, three for the node on 
 - LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
-
 ### Performance
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.
 
@@ -63,7 +62,6 @@ Dataset      |  	  UAS		      |  	 LAS		      |
 Danish       | 0.769061876248	  | 0.694810379242	|
 English			 |			|		 	|
 Swedish			 | 0.734714200358	  | 0.634933280223	|  
-
 
 #### Complexity
 The Arc-Eager Transition-Based Dependency Parser (AE Parser) has an overall time and space, best and worse-case complexity of O(n), where n is the number of nodes (words) in the input sentence.  By disallowing non-projective dependency arcs, the AE Parser algorithm skips many of the node pairs that are considered by non-projective algorithms, thereby optimizing time and space measures.  

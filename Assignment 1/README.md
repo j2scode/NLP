@@ -53,7 +53,7 @@ The purpose of this assignment is to explore the relationship between features a
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
 
-###Performance
+### Performance
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.
 
 Dataset      |  	  UAS		      |  	 LAS		      |  

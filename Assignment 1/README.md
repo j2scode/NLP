@@ -34,12 +34,14 @@ The purpose of this assignment was to implement the four AE operations: left_arc
 -	Reduce (pops) the token on top of the stack λ1. It is important to ensure that the parser does not pop the top token if it has not been assigned a head, since it will be left unattached.
 -	Right-Arc transition adds an edge from the token on top of the stack λ1 to the next input token and involves pushing the token onto the stack. 
 -	Left-Arc adds an edge from the next input token to the token on top of the stack λ1 and  involves popping the token from the stack. This transition is only allowed when the top token is not the root node and is not dependent on any other node.
+
 ### Features
 A total of eight features were trained, four features pertaining to the node on the top of the stack and four features associated with the next node in the input buffer and they were:
 -	FORM - the word form, or a punctuation symbol 
 -	FEATS - unordered set of additional syntactic features, separated by | 
 -	LDEP – left most dependent
 -	RDEP – right most dependent
+
 ### Performance
 The algorithm was executed on the Swedish training and test sets.  The unlabeled and labeled attachment scores, UAS, and LAS respectively were: 
 -	UAS: 0.23819956184
@@ -49,11 +51,13 @@ The rather abysmal scores suggest that new features be added to the model, which
 ## Assignment 2: Feature Selection and Implementation
 ### Purpose
 The purpose of this assignment is to explore the relationship between features and model performance.  
+
 ### Features
 To improve performance, six new features were introduced, three for the node on the top of the stack and three for the next node in the input buffer and they were:
 - LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
+
 ### Performance
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.
 
@@ -63,7 +67,7 @@ Danish       | 0.769061876248	  | 0.694810379242	|
 English			 |			|		 	|
 Swedish			 | 0.734714200358	  | 0.634933280223	|  
 
-#### Complexity
+### Complexity
 The Arc-Eager Transition-Based Dependency Parser (AE Parser) has an overall time and space, best and worse-case complexity of O(n), where n is the number of nodes (words) in the input sentence.  By disallowing non-projective dependency arcs, the AE Parser algorithm skips many of the node pairs that are considered by non-projective algorithms, thereby optimizing time and space measures.  
 
 The features added in assignment 2 are so-called “static” features, in that their values do not change for a word during processing.  Dynamic features must be stored and indexed for each transition, thereby increasing computational cost.  Unlike dynamic features, the static features are memory resident or stored locally where they can be retrieved quickly.  Thusly, significant performance accuracy improvements were achieved with no increase in computational complexity.

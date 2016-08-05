@@ -29,11 +29,14 @@ Stack
 - Stack [0] CTAG – course-grained part of speech tag
 - Stack [0] TAG – fine-grained part of speech tag
 
-### Complexity
-The complexity of the Arc Eager Dependency Parsing algorithm is O(n), for a sentence containing n words.  The additional features don't modify the training procedure and so linear time complexity is maintained.
-
 ### Performance of Feature Set 2
 The performance of feature set 2 was as follows:
 - UAS: 0.735112527385 
 - LAS: 0.634335789683
+
+### Complexity and Performance
+The Arc-Eager Transition-Based Dependency Parser (AE Parser) has an overall time and space, best and worse-case complexity of O(n), where n is the number of nodes (words) in the input sentence.  By disallowing non-projective dependency arcs, the AE Parser algorithm skips many of the node pairs that are considered by non-projective algorithms, thereby optimizing time and space measures. 
+
+The AE Parser performs well and is only slightly over-performed by the non-projective dependency parsers with a margin that is directly related to the proportion of non-projective dependencies in the data. 
+
 

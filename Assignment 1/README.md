@@ -1,5 +1,4 @@
 # Introduction to Natural Language Processing
-<<<<<<< HEAD
 ## Introduction
 One task of natural language processing (NLP) is to transform text in natural language into representations that computers can use to perform many different tasks such as error correction, machine translation, information extraction, predictive text processing and interactive question answering.  Dividing text into sentences and then into words, assigning parts of speech to words, and deriving syntactic and semantic representations for sentences are among the processes involved in allowing computers to “understand” and manipulate text.  In NLP, data driven, transition-based, dependency parsing is the problem of taking sentences and determining which parts depend on others, and in what way.  
 
@@ -54,11 +53,11 @@ The purpose of this assignment is to explore the relationship between features a
 ###Performance
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.
 
-Dataset                                   |  	UAS		|  	 LAS		|  
----------------------------------------------------------------------------------
-Danish                                  |    0.769061876248	|     0.694810379242	|
-English			|			|		 	|
-Swedish			|    0.734714200358	|     0.634933280223	|  
+Dataset      |  	  UAS		      |  	 LAS		      |  
+---------------------------------------------------
+Danish       | 0.769061876248	  | 0.694810379242	|
+English			 |			|		 	|
+Swedish			 | 0.734714200358	  | 0.634933280223	|  
 
 
 #### Complexity

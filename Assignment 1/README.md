@@ -53,7 +53,7 @@ The rather abysmal scores suggest that new features be added to the model, which
 The purpose of this assignment is to explore the relationship between features and model performance.  
 
 ### Features
-To improve performance, I added the following seven new features:
+To improve performance, I added the following new features:
 #### Stack [0] Features
 - LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
 - CPOSTAG - course-grained part-of-speech tag 
@@ -72,8 +72,8 @@ To improve performance, I added the following seven new features:
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.
 
 #### Danish Model
-- UAS 0.769061876248
-- LAS 0.694810379242	
+- UAS 0.766866267465
+- LAS 0.697005988024	
 
 #### English Model
 - UAS

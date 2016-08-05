@@ -48,7 +48,9 @@ The algorithm was executed on the Swedish training and test sets.  The unlabeled
 The rather abysmal scores suggest that new features be added to the model, which we examine in the next assignment.
 ## Assignment 2: Feature Selection and Implementation
 ### Purpose
-The purpose of this assignment is to explore the relationship between features and model performance.  To improve performance, six new features were introduced, three for the node on the top of the stack and three for the next node in the input buffer and they were:
+The purpose of this assignment is to explore the relationship between features and model performance.  
+### Features
+To improve performance, six new features were introduced, three for the node on the top of the stack and three for the next node in the input buffer and they were:
 - LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag

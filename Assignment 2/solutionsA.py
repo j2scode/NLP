@@ -166,6 +166,51 @@ def score_output(scores, filename):
 # Like score(), this function returns a python list of scores
 def linearscore(unigrams, bigrams, trigrams, corpus):
     scores = []
+    lambda1 = 1 / 3.0
+    lambda2 = 1 / 3.0
+    lambda3 = 1 / 3.0
+
+    for sentence in corpus:
+
+        # Extract and estimate unigrams probabilities from sentence
+        prob = 0.0
+        prob_uni = 0.0
+        tokens = sentence.strip().split()
+        tokens.append(STOP_SYMBOL)
+        for token in tokens:
+            token = (token,)
+            if unigrams.has_key(token):
+                prob_uni = prob_uni + (lambda1 * unigrams[token])
+            else:
+                prob_uni = MINUS_INFINITY_SENTENCE_LOG_PROB
+                break
+
+        # Extract and estimate bigrams probabilities from sentence
+        prob_bi = 0.0
+        tokens.insert(0, START_SYMBOL)
+        sent_bigrams = tuple(nltk.bigrams(tokens))
+        for bigram in sent_bigrams:
+            if bigrams.has_key(bigram):
+                prob_bi = prob_bi + (lambda2 * bigrams[bigram])
+            else:
+                prob_bi = MINUS_INFINITY_SENTENCE_LOG_PROB
+                break
+
+        # Extract and estimate trigrams probabilities from sentence
+        prob_tri = 0.0
+        tokens.insert(0, START_SYMBOL)
+        sent_trigrams = tuple(nltk.trigrams(tokens))
+        for trigram in sent_trigrams:
+            if trigrams.has_key(trigram):
+                prob_tri = prob_tri + (lambda3 * trigrams[trigram])
+            else:
+                prob_tri = MINUS_INFINITY_SENTENCE_LOG_PROB
+                break
+
+        # Sum probabilities and append to score list
+        prob = prob_uni + prob_bi + prob_tri
+        scores.append(prob)
+
     return scores
 
 DATA_PATH = 'data/'

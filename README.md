@@ -24,6 +24,7 @@ The performance was as follows:
 
 ###Performance of Feature Set 2:
 The following features were added to feature set 1:
+
 Stack
 •	Stack [0] Lemma – stem of the word
 •	Stack [0] CTAG – course-grained part of speech tag

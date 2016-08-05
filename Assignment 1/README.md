@@ -53,8 +53,18 @@ The rather abysmal scores suggest that new features be added to the model, which
 The purpose of this assignment is to explore the relationship between features and model performance.  
 
 ### Features
-To improve performance, six new features were introduced, three for the node on the top of the stack and three for the next node in the input buffer and they were:
+To improve performance, I added the following seven new features:
+#### Stack [0] Features
 - LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
+- CPOSTAG - course-grained part-of-speech tag 
+- POSTAG - fine-grained part-of-speech tag
+
+#### Buffer [0] Features
+- LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
+- CPOSTAG - course-grained part-of-speech tag 
+- POSTAG - fine-grained part-of-speech tag
+
+#### Buffer [1] Features
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
 
@@ -70,8 +80,8 @@ The new features were implemented for the English, Swedish and Danish data sets.
 - LAS
 
 #### Swedish Model
-- UAS 0.734714200358
-- LAS 0.634933280223	|  
+- UAS 0.737104162517
+- LAS 0.644293965346	|  
 
 ### Complexity
 The Arc-Eager Transition-Based Dependency Parser (AE Parser) has an overall time and space, best and worse-case complexity of O(n), where n is the number of nodes (words) in the input sentence.  By disallowing non-projective dependency arcs, the AE Parser algorithm skips many of the node pairs that are considered by non-projective algorithms, thereby optimizing time and space measures.  

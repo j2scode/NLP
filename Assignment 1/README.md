@@ -1,5 +1,5 @@
-# Introduction to Natural Language Processing: Dependency Parsing
-## Introduction
+# Introduction to Natural Language Processing
+## Introduction to Dependency Parsing
 One task of natural language processing (NLP) is to transform text in natural language into representations that computers can use to perform many different tasks such as error correction, machine translation, information extraction, predictive text processing and interactive question answering.  Dividing text into sentences and then into words, assigning parts of speech to words, and deriving syntactic and semantic representations for sentences are among the processes involved in allowing computers to “understand” and manipulate text.  In NLP, data driven, transition-based, dependency parsing is the problem of taking sentences and determining which parts depend on others, and in what way.  
 
 Transition-based dependency parsing models the parsing problem as a series of decisions or, transitions, to be made between parsing configurations.  A configuration is comprised of:

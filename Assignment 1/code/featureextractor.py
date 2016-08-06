@@ -183,5 +183,4 @@ class FeatureExtractor(object):
                     for feat in feats:
                         result.append('BUF_2_FEATS_' + feat)
 
-
         return result

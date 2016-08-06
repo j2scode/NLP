@@ -72,16 +72,16 @@ To improve performance, I added the following new features:
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.
 
 #### Danish Model
-- UAS 0.766866267465
-- LAS 0.697005988024	
+- UAS 0.791616766467
+- LAS 0.705988023952	
 
 #### English Model
-- UAS
-- LAS
+- UAS 0.830188679245
+- LAS 0.767295597484
 
 #### Swedish Model
-- UAS 0.737104162517
-- LAS 0.644293965346	|  
+- UAS 0.772555267875
+- LAS 0.656442939653	|  
 
 ### Complexity
 The Arc-Eager Transition-Based Dependency Parser (AE Parser) has an overall time and space, best and worse-case complexity of O(n), where n is the number of nodes (words) in the input sentence.  By disallowing non-projective dependency arcs, the AE Parser algorithm skips many of the node pairs that are considered by non-projective algorithms, thereby optimizing time and space measures.  

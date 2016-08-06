@@ -59,14 +59,31 @@ To improve performance, I added the following new features:
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
 
+## Stack[1] Features
+- FORM - the word form, or a punctuation symbol
+- LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
+- CPOSTAG - course-grained part-of-speech tag 
+- POSTAG - fine-grained part-of-speech tag
+-	FEATS - unordered set of additional syntactic features, separated by | 
+	
 #### Buffer [0] Features
 - LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
 
 #### Buffer [1] Features
+- FORM - the word form, or a punctuation symbol
+- LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
 - CPOSTAG - course-grained part-of-speech tag 
 - POSTAG - fine-grained part-of-speech tag
+-	FEATS - unordered set of additional syntactic features, separated by | 
+
+#### Buffer[2] Features
+- FORM - the word form, or a punctuation symbol
+- LEMMA - the lemma or the stem of the word form, or an underscore if this is not available 
+- CPOSTAG - course-grained part-of-speech tag 
+- POSTAG - fine-grained part-of-speech tag
+-	FEATS - unordered set of additional syntactic features, separated by | 
 
 ### Performance
 The new features were implemented for the English, Swedish and Danish data sets.  The following summarizes labeled and unlabeled attachment scores.

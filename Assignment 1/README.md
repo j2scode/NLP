@@ -76,8 +76,8 @@ The new features were implemented for the English, Swedish and Danish data sets.
 - LAS 0.705988023952	
 
 #### English Model
-- UAS
-- LAS
+- UAS 0.830188679245
+- LAS 0.767295597484
 
 #### Swedish Model
 - UAS 0.772555267875

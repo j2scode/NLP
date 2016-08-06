@@ -61,13 +61,9 @@ class FeatureExtractor(object):
         result = []
 
 
-        global printed
-        if not printed:
-            print("This is not a very good feature extractor!")
-            printed = True
-
         # an example set of features:
         if stack:
+            # STACK[0] Attributes
             stack_idx0 = stack[-1]
             token = tokens[stack_idx0]
             if FeatureExtractor._check_informative(token['word'], True):
@@ -95,7 +91,9 @@ class FeatureExtractor(object):
             if FeatureExtractor._check_informative(dep_right_most):
                 result.append('STK_0_RDEP_' + dep_right_most)
 
+
         if buffer:
+            # BUF[0] Attributes
             buffer_idx0 = buffer[0]
             token = tokens[buffer_idx0]
             if FeatureExtractor._check_informative(token['word'], True):
@@ -115,11 +113,38 @@ class FeatureExtractor(object):
                 for feat in feats:
                     result.append('BUF_0_FEATS_' + feat)
 
+            # Left most, right most dependency of BUF[0]
             dep_left_most, dep_right_most = FeatureExtractor.find_left_right_dependencies(buffer_idx0, arcs)
 
             if FeatureExtractor._check_informative(dep_left_most):
                 result.append('BUF_0_LDEP_' + dep_left_most)
             if FeatureExtractor._check_informative(dep_right_most):
                 result.append('BUF_0_RDEP_' + dep_right_most)
+
+            # # BUF[1] Attributes
+            # buffer_idx1 = buffer[1]
+            # token = tokens[buffer_idx1]
+            #
+            # if FeatureExtractor._check_informative(token['word'], True):
+            #     result.append('BUF_1_FORM_' + token['word'])
+            #
+            # if FeatureExtractor._check_informative(token['ctag'], True):
+            #     result.append('BUF_1_CTAG_' + token['ctag'])
+            #
+            # if FeatureExtractor._check_informative(token['tag'], True):
+            #     result.append('BUF_1_TAG_' + token['tag'])
+
+            # # BUF[2] Attributes
+            # buffer_idx2 = buffer[2]
+            # token = tokens[buffer_idx2]
+            #
+            # if FeatureExtractor._check_informative(token['word'], True):
+            #     result.append('BUF_2_FORM_' + token['word'])
+            #
+            # if FeatureExtractor._check_informative(token['ctag'], True):
+            #     result.append('BUF_2_CTAG_' + token['ctag'])
+            #
+            # if FeatureExtractor._check_informative(token['tag'], True):
+            #     result.append('BUF_2_TAG_' + token['tag'])
 
         return result

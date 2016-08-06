@@ -4,19 +4,20 @@ from providedcode.transitionparser import TransitionParser
 from providedcode.evaluate import DependencyEvaluator
 from featureextractor import FeatureExtractor
 from transition import Transition
-
+import time
 if __name__ == '__main__':
-    data = dataset.get_swedish_train_corpus().parsed_sents()
+
+    data = dataset.get_english_train_corpus().parsed_sents()
     random.seed(1234)
     subdata = random.sample(data, 200)
 
     try:
         tp = TransitionParser(Transition, FeatureExtractor)
         tp.train(subdata)
-        tp.save('swedish.model')
+        tp.save('english.model')
 
-        testdata = dataset.get_swedish_test_corpus().parsed_sents()
-        tp = TransitionParser.load('swedish.model')
+        testdata = dataset.get_english_dev_corpus().parsed_sents()
+        tp = TransitionParser.load('english.model')
 
         parsed = tp.parse(testdata)
 

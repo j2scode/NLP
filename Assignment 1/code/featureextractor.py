@@ -61,7 +61,7 @@ class FeatureExtractor(object):
         result = []
 
 
-        # an example set of features:
+        # Feature Set:
         if stack:
             # STACK[0] Attributes
             stack_idx0 = stack[-1]
@@ -91,6 +91,26 @@ class FeatureExtractor(object):
             if FeatureExtractor._check_informative(dep_right_most):
                 result.append('STK_0_RDEP_' + dep_right_most)
 
+            # STACK[1] Attributes
+                if len(stack) > 1:
+                    stack_idx1 = stack[-2]
+                    token = tokens[stack_idx1]
+                    if FeatureExtractor._check_informative(token['word'], True):
+                        result.append('STK_1_FORM_' + token['word'])
+
+                    if FeatureExtractor._check_informative(token['lemma'], True):
+                        result.append('STK_1_LEMMA_' + token['lemma'])
+
+                    if FeatureExtractor._check_informative(token['ctag'], True):
+                        result.append('STK_1_CTAG_' + token['ctag'])
+
+                    if FeatureExtractor._check_informative(token['tag'], True):
+                        result.append('STK_1_TAG_' + token['tag'])
+
+                    if 'feats' in token and FeatureExtractor._check_informative(token['feats']):
+                        feats = token['feats'].split("|")
+                        for feat in feats:
+                            result.append('STK_1_FEATS_' + feat)
 
         if buffer:
             # BUF[0] Attributes
@@ -121,30 +141,47 @@ class FeatureExtractor(object):
             if FeatureExtractor._check_informative(dep_right_most):
                 result.append('BUF_0_RDEP_' + dep_right_most)
 
-            # # BUF[1] Attributes
-            # buffer_idx1 = buffer[1]
-            # token = tokens[buffer_idx1]
-            #
-            # if FeatureExtractor._check_informative(token['word'], True):
-            #     result.append('BUF_1_FORM_' + token['word'])
-            #
-            # if FeatureExtractor._check_informative(token['ctag'], True):
-            #     result.append('BUF_1_CTAG_' + token['ctag'])
-            #
-            # if FeatureExtractor._check_informative(token['tag'], True):
-            #     result.append('BUF_1_TAG_' + token['tag'])
+            # BUF[1] Attributes
+            if len(buffer) > 1:
+                buffer_idx1 = buffer[1]
+                token = tokens[buffer_idx1]
+                if FeatureExtractor._check_informative(token['word'], True):
+                    result.append('BUF_1_FORM_' + token['word'])
 
-            # # BUF[2] Attributes
-            # buffer_idx2 = buffer[2]
-            # token = tokens[buffer_idx2]
-            #
-            # if FeatureExtractor._check_informative(token['word'], True):
-            #     result.append('BUF_2_FORM_' + token['word'])
-            #
-            # if FeatureExtractor._check_informative(token['ctag'], True):
-            #     result.append('BUF_2_CTAG_' + token['ctag'])
-            #
-            # if FeatureExtractor._check_informative(token['tag'], True):
-            #     result.append('BUF_2_TAG_' + token['tag'])
+                if FeatureExtractor._check_informative(token['lemma'], True):
+                    result.append('BUF_1_LEMMA_' + token['lemma'])
+
+                if FeatureExtractor._check_informative(token['ctag'], True):
+                    result.append('BUF_1_CTAG_' + token['ctag'])
+
+                if FeatureExtractor._check_informative(token['tag'], True):
+                    result.append('BUF_1_TAG_' + token['tag'])
+
+                if 'feats' in token and FeatureExtractor._check_informative(token['feats']):
+                    feats = token['feats'].split("|")
+                    for feat in feats:
+                        result.append('BUF_1_FEATS_' + feat)
+
+            # BUF[2] Attributes
+            if len(buffer) > 2:
+                buffer_idx2 = buffer[2]
+                token = tokens[buffer_idx2]
+                if FeatureExtractor._check_informative(token['word'], True):
+                    result.append('BUF_2_FORM_' + token['word'])
+
+                if FeatureExtractor._check_informative(token['lemma'], True):
+                    result.append('BUF_2_LEMMA_' + token['lemma'])
+
+                if FeatureExtractor._check_informative(token['ctag'], True):
+                    result.append('BUF_2_CTAG_' + token['ctag'])
+
+                if FeatureExtractor._check_informative(token['tag'], True):
+                    result.append('BUF_2_TAG_' + token['tag'])
+
+                if 'feats' in token and FeatureExtractor._check_informative(token['feats']):
+                    feats = token['feats'].split("|")
+                    for feat in feats:
+                        result.append('BUF_2_FEATS_' + feat)
+
 
         return result

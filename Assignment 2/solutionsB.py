@@ -88,6 +88,13 @@ def q2_output(q_values, filename):
 # Note: words that appear exactly 5 times should be considered rare!
 def calc_known(brown_words):
     known_words = set([])
+
+    unique_words = set(word for sentence in brown_words for word in sentence)
+
+    for word in unique_words:
+        if word not in known_words and sum(words.count(word) for words in brown_words) > RARE_WORD_MAX_FREQ:
+            known_words.add(word)
+
     return known_words
 
 # TODO: IMPLEMENT THIS FUNCTION
@@ -95,9 +102,13 @@ def calc_known(brown_words):
 # Returns the equivalent to brown_words but replacing the unknown words by '_RARE_' (use RARE_SYMBOL constant)
 def replace_rare(brown_words, known_words):
     brown_words_rare = []
+
+    for sentence in brown_words:
+        brown_words_rare.append([RARE_SYMBOL if word not in known_words else word for word in sentence])
+
     return brown_words_rare
 
-# This function takes the ouput from replace_rare and outputs it to a file
+# This function takes the output from replace_rare and outputs it to a file
 def q3_output(rare, filename):
     outfile = open(filename, 'w')
     for sentence in rare:

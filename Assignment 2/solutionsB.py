@@ -19,6 +19,24 @@ LOG_PROB_OF_ZERO = -1000
 def split_wordtags(brown_train):
     brown_words = []
     brown_tags = []
+
+    for sentence in brown_train:
+        word_list = []
+        tag_list = []
+        word_list.append(START_SYMBOL)
+        word_list.append(START_SYMBOL)
+        tag_list.append(START_SYMBOL)
+        tag_list.append(START_SYMBOL)
+        tokens = sentence.strip().split()
+        for token in tokens:
+            i = token.rfind('/')
+            word_list.append(token[:i])
+            tag_list.append(token[i+1:])
+        word_list.append(STOP_SYMBOL)
+        tag_list.append(STOP_SYMBOL)
+        brown_words.append(word_list)
+        brown_tags.append(tag_list)
+
     return brown_words, brown_tags
 
 
@@ -27,6 +45,30 @@ def split_wordtags(brown_train):
 # It returns a python dictionary where the keys are tuples that represent the tag trigram, and the values are the log probability of that trigram
 def calc_trigrams(brown_tags):
     q_values = {}
+    bigrams = {}
+    trigrams = {}
+
+    for sequence in brown_tags:
+
+        # Build Bigram Dictionary
+        bigram_tuples = tuple(nltk.bigrams(sequence))
+        for bigram in bigram_tuples:
+            if bigram in bigrams:
+                bigrams[bigram] += 1
+            else:
+                bigrams[bigram] = 1
+
+        # Build Trigram Dictionary
+        trigram_tuples = tuple(nltk.trigrams(sequence))
+        for trigram in trigram_tuples:
+            if trigram in trigrams:
+                trigrams[trigram] += 1
+            else:
+                trigrams[trigram] = 1
+
+        # Calculate Trigram Probabilities
+        q_values = {trigram: math.log(float(count) / bigrams[trigram[:2]], 2) for trigram, count in trigrams.iteritems()}
+
     return q_values
 
 # This function takes output from calc_trigrams() and outputs it in the proper format

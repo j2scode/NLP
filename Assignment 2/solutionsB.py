@@ -88,14 +88,13 @@ def q2_output(q_values, filename):
 # Note: words that appear exactly 5 times should be considered rare!
 def calc_known(brown_words):
     known_words = set([])
+    print "Total words in brown are ", len(brown_words)
 
-    unique_words = set(word for sentence in brown_words for word in sentence)
-
-    for word in unique_words:
-        if word not in known_words and sum(words.count(word) for words in brown_words) > RARE_WORD_MAX_FREQ:
-            known_words.add(word)
-
-    print known_words
+    flat_words = [word for sentence in brown_words for word in sentence]
+    unique_words = set(flat_words)
+    known_words_list = [word for word in unique_words if flat_words.count(word) > RARE_WORD_MAX_FREQ]
+    known_words = set(known_words_list)
+    print "There are ", len(known_words), "known words"
 
     return known_words
 

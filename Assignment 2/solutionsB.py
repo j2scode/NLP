@@ -132,21 +132,25 @@ def q3_output(rare, filename):
 def calc_emission(brown_words_rare, brown_tags):
     e_values = {}
     taglist = set([])
+    c_w_t = {}
+    c_t = {}
 
-    # Flatten and combine words and tags into a single list of tuples
-    words_flat = [word for sentence in brown_words_rare for word in sentence]
-    tags_flat = [tag for sentence in brown_tags for tag in sentence]
-    word_tags = list(zip(words_flat, tags_flat))
-
-    # Count occurrences of each word-tag combination and each tag
-    c_w_t = dict((w_t, word_tags.count(w_t)) for w_t in set(word_tags))
-    c_t = dict((t, tags_flat.count(t)) for t in set(tags_flat))
+    for word_sent, tag_sent in zip(brown_words_rare, brown_tags):
+        for w, t in zip(word_sent, tag_sent):
+            w_t = (w, t)
+            if w_t in c_w_t:
+                c_w_t[w_t] += 1
+            else:
+                c_w_t[w_t] = 1
+            if t in c_t:
+                c_t[t] += 1
+            else:
+                c_t[t] = 1
+            if t not in taglist:
+                taglist.add(t)
 
     # Calculate probabilities
     e_values = {w_t: math.log(float(count) / c_t[w_t[1]], 2) for w_t, count in c_w_t.iteritems()}
-
-    # Create set of all possible tags
-    taglist = set(word_tags)
 
     return e_values, taglist
 

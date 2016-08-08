@@ -95,6 +95,8 @@ def calc_known(brown_words):
         if word not in known_words and sum(words.count(word) for words in brown_words) > RARE_WORD_MAX_FREQ:
             known_words.add(word)
 
+    print known_words
+
     return known_words
 
 # TODO: IMPLEMENT THIS FUNCTION
@@ -124,6 +126,22 @@ def q3_output(rare, filename):
 def calc_emission(brown_words_rare, brown_tags):
     e_values = {}
     taglist = set([])
+
+    # Flatten and combine words and tags into a single list of tuples
+    words_flat = [word for sentence in brown_words_rare for word in sentence]
+    tags_flat = [tag for sentence in brown_tags for tag in sentence]
+    word_tags = list(zip(words_flat, tags_flat))
+
+    # Count occurrences of each word-tag combination and each tag
+    c_w_t = dict((w_t, word_tags.count(w_t)) for w_t in set(word_tags))
+    c_t = dict((t, tags_flat.count(t)) for t in set(tags_flat))
+
+    # Calculate probabilities
+    e_values = {w_t: math.log(float(count) / c_t[w_t[1]], 2) for w_t, count in c_w_t.iteritems()}
+
+    # Create set of all possible tags
+    taglist = set(word_tags)
+
     return e_values, taglist
 
 # This function takes the output from calc_emissions() and outputs it
@@ -192,27 +210,38 @@ def main():
     infile = open(DATA_PATH + "Brown_tagged_train.txt", "r")
     brown_train = infile.readlines()
     infile.close()
+    print "Open Brown training data  time: " + str(time.clock()) + ' sec'
+
 
     # split words and tags, and add start and stop symbols (question 1)
     brown_words, brown_tags = split_wordtags(brown_train)
+    print "Split word tags time: " + str(time.clock()) + ' sec'
+
 
     # calculate tag trigram probabilities (question 2)
     q_values = calc_trigrams(brown_tags)
+    print "Calculate trigrams time: " + str(time.clock()) + ' sec'
+
 
     # question 2 output
     q2_output(q_values, OUTPUT_PATH + 'B2.txt')
 
     # calculate list of words with count > 5 (question 3)
     known_words = calc_known(brown_words)
+    print "Calculate known words time: " + str(time.clock()) + ' sec'
+
 
     # get a version of brown_words with rare words replace with '_RARE_' (question 3)
     brown_words_rare = replace_rare(brown_words, known_words)
+    print "Replace rare words time: " + str(time.clock()) + ' sec'
+
 
     # question 3 output
     q3_output(brown_words_rare, OUTPUT_PATH + "B3.txt")
 
     # calculate emission probabilities (question 4)
     e_values, taglist = calc_emission(brown_words_rare, brown_tags)
+    print "Calculate emission probabilities time: " + str(time.clock()) + ' sec'
 
     # question 4 output
     q4_output(e_values, OUTPUT_PATH + "B4.txt")
@@ -225,20 +254,25 @@ def main():
     infile = open(DATA_PATH + "Brown_dev.txt", "r")
     brown_dev = infile.readlines()
     infile.close()
+    print "Open Brown development data time: " + str(time.clock()) + ' sec'
+
 
     # format Brown development data here
     brown_dev_words = []
     for sentence in brown_dev:
         brown_dev_words.append(sentence.split(" ")[:-1])
+    print "Format Brown development data time: " + str(time.clock()) + ' sec'
 
     # do viterbi on brown_dev_words (question 5)
     viterbi_tagged = viterbi(brown_dev_words, taglist, known_words, q_values, e_values)
+    print "Run Viterbi algorithm on time: " + str(time.clock()) + ' sec'
 
     # question 5 output
     q5_output(viterbi_tagged, OUTPUT_PATH + 'B5.txt')
 
     # do nltk tagging here
     nltk_tagged = nltk_tagger(brown_words, brown_tags, brown_dev_words)
+    print "NLTK tagger time: " + str(time.clock()) + ' sec'
 
     # question 6 output
     q6_output(nltk_tagged, OUTPUT_PATH + 'B6.txt')

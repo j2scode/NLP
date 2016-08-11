@@ -2,6 +2,7 @@ import sys
 import nltk
 import math
 import time
+import itertools
 
 START_SYMBOL = '*'
 STOP_SYMBOL = 'STOP'
@@ -177,8 +178,57 @@ def q4_output(e_values, filename):
 # The return value is a list of tagged sentences in the format "WORD/TAG", separated by spaces. Each sentence is a string with a 
 # terminal newline, not a list of tokens. Remember also that the output should not contain the "_RARE_" symbol, but rather the
 # original words of the sentence!
+# This code is based upon the algorithm as described in Collins, M. (2011). Tagging with Hidden Markov Models. New York: Columbia University.
+
+
 def viterbi(brown_dev_words, taglist, known_words, q_values, e_values):
     tagged = []
+
+    # Initialize
+    pi = {}
+    bp = {}
+    pi[(0, START_SYMBOL, START_SYMBOL)] = 0.0
+
+    for sentence in brown_dev_words:
+        tokens = [w if w in known_words else RARE_SYMBOL for w in sentence]
+
+        # Base Case 1: k = 1, calculate probability of ('*', '*', w) for w in K
+        for w in taglist:
+            pi[(1, START_SYMBOL, w)] = pi[(0, START_SYMBOL, START_SYMBOL)] + q_values.get((START_SYMBOL, START_SYMBOL, w), RARE_WORD_MAX_FREQ) + e_values.get((tokens[0], w), RARE_WORD_MAX_FREQ)
+
+        # Base Case 2: k = 2, calculate probability of ('*', w, u) for w, u in K
+        for w, u in itertools.product(taglist, taglist):
+            key = (2, w, u)
+            pi[key] = pi[(1, START_SYMBOL, w)] + q_values.get((START_SYMBOL, w, u), RARE_WORD_MAX_FREQ) + e_values.get((tokens[1], u), RARE_WORD_MAX_FREQ)
+
+        # Recursive Case:
+        for k in range(3, len(tokens)):
+            for u, v in itertools.product(taglist, taglist):
+                key = (k, u, v)
+                max_prob = 0
+                max_tag = ""
+                for w in taglist:
+                    prob = pi.get((k-1,w, u), RARE_WORD_MAX_FREQ) + q_values.get((w, u, v), RARE_WORD_MAX_FREQ) + e_values.get((tokens[k-1], v), RARE_WORD_MAX_FREQ)
+                    if prob > max_prob:
+                        max_prob = prob
+                        max_tag = w
+                pi[key] = max_prob
+                bp[key] = max_tag
+
+                print key, pi[key]
+            print '\n'
+
+        # Get probability for final pair
+        for u, v in itertools.product(taglist, taglist):
+            max_prob = 0
+            max_tag = ""
+            prob = pi.get((len(tokens)-1, u, v), RARE_WORD_MAX_FREQ) + q_values.get((u, v, STOP_SYMBOL), RARE_WORD_MAX_FREQ)
+            if prob > max_prob:
+                max_prob = prob
+                max_u = u
+                max_v = v
+
+        break
     return tagged
 
 # This function takes the output of viterbi() and outputs it to file

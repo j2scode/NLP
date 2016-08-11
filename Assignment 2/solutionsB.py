@@ -185,50 +185,63 @@ def viterbi(brown_dev_words, taglist, known_words, q_values, e_values):
     tagged = []
 
     # Initialize
+    tagspace = {}
+    taglist = [tag for tag in taglist if tag not in (STOP_SYMBOL, START_SYMBOL)]
+    tagspace[-1] = list(START_SYMBOL)
+    tagspace[0] = list(START_SYMBOL)
+
     pi = {}
     bp = {}
     pi[(0, START_SYMBOL, START_SYMBOL)] = 0.0
 
     for sentence in brown_dev_words:
+
+        n = len(sentence)
+
+        # Create tagspace
+        for k in range(1, n+1):
+            tagspace[k] = taglist
+
+        # Create copy of sentence with rare words marked with RARE symbol
         tokens = [w if w in known_words else RARE_SYMBOL for w in sentence]
 
-        # Base Case 1: k = 1, calculate probability of ('*', '*', w) for w in K
-        for w in taglist:
-            pi[(1, START_SYMBOL, w)] = pi[(0, START_SYMBOL, START_SYMBOL)] + q_values.get((START_SYMBOL, START_SYMBOL, w), RARE_WORD_MAX_FREQ) + e_values.get((tokens[0], w), RARE_WORD_MAX_FREQ)
-
-        # Base Case 2: k = 2, calculate probability of ('*', w, u) for w, u in K
-        for w, u in itertools.product(taglist, taglist):
-            key = (2, w, u)
-            pi[key] = pi[(1, START_SYMBOL, w)] + q_values.get((START_SYMBOL, w, u), RARE_WORD_MAX_FREQ) + e_values.get((tokens[1], u), RARE_WORD_MAX_FREQ)
-
-        # Recursive Case:
-        for k in range(3, len(tokens)):
-            for u, v in itertools.product(taglist, taglist):
-                key = (k, u, v)
-                max_prob = 0
-                max_tag = ""
-                for w in taglist:
+        # Iterate over columns from 1 to k
+        for k in range(1, n):
+            for u, v in itertools.product(tagspace[k-1], tagspace[k]):
+                max_prob = -float('Inf')
+                max_tag = ''
+                for w in tagspace[k-2]:
                     prob = pi.get((k-1,w, u), RARE_WORD_MAX_FREQ) + q_values.get((w, u, v), RARE_WORD_MAX_FREQ) + e_values.get((tokens[k-1], v), RARE_WORD_MAX_FREQ)
                     if prob > max_prob:
                         max_prob = prob
                         max_tag = w
-                pi[key] = max_prob
-                bp[key] = max_tag
+                pi[k, u, v] = max_prob
+                bp[k, u, v] = max_tag
+            print k, bp[k, u, v]
 
-                print key, pi[key]
-            print '\n'
-
-        # Get probability for final pair
-        for u, v in itertools.product(taglist, taglist):
-            max_prob = 0
-            max_tag = ""
-            prob = pi.get((len(tokens)-1, u, v), RARE_WORD_MAX_FREQ) + q_values.get((u, v, STOP_SYMBOL), RARE_WORD_MAX_FREQ)
+        # Get max of last two tokens ending in STOP
+        max_prob = -float('Inf')
+        for u, v in itertools.product(tagspace[n-1], tagspace[n]):
+            prob = pi.get((n, u, v), RARE_WORD_MAX_FREQ) + q_values.get((u, v, STOP_SYMBOL), RARE_WORD_MAX_FREQ)
             if prob > max_prob:
                 max_prob = prob
-                max_u = u
                 max_v = v
+                max_u = u
+
+        # Format tag sequence
+        y = {}
+        y[n] = max_v
+        y[n-1] = max_u
+
+        # for k in range((n-2), -1, -1):
+        #     y[k] = bp[k+2, y[k+1], y[k+2]]
+        #     print k, y[k]
+
+
 
         break
+
+
     return tagged
 
 # This function takes the output of viterbi() and outputs it to file

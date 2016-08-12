@@ -182,9 +182,10 @@ def q4_output(e_values, filename):
 
 
 def viterbi(brown_dev_words, taglist, known_words, q_values, e_values):
+    import csv
     tagged = []
 
-    # Initialize
+    # Initialize tagspace
     tagspace = {}
     taglist = [tag for tag in taglist if tag not in (STOP_SYMBOL, START_SYMBOL)]
     tagspace[-1] = list(START_SYMBOL)
@@ -193,10 +194,13 @@ def viterbi(brown_dev_words, taglist, known_words, q_values, e_values):
     pi = {}
     bp = {}
     pi[(0, START_SYMBOL, START_SYMBOL)] = 0.0
+    test_sentences = ["Jenny fired Britain ."]
 
     for sentence in brown_dev_words:
 
+        print sentence
         n = len(sentence)
+        print "Sentence is length", n
 
         # Create tagspace
         for k in range(1, n+1):
@@ -205,37 +209,45 @@ def viterbi(brown_dev_words, taglist, known_words, q_values, e_values):
         # Create copy of sentence with rare words marked with RARE symbol
         tokens = [w if w in known_words else RARE_SYMBOL for w in sentence]
 
+        trellis = []
         # Iterate over columns from 1 to k
-        for k in range(1, n):
+        for k in range(1, n+1):
             for u, v in itertools.product(tagspace[k-1], tagspace[k]):
                 max_prob = -float('Inf')
                 max_tag = ''
                 for w in tagspace[k-2]:
-                    prob = pi.get((k-1,w, u), RARE_WORD_MAX_FREQ) + q_values.get((w, u, v), RARE_WORD_MAX_FREQ) + e_values.get((tokens[k-1], v), RARE_WORD_MAX_FREQ)
+                    prob = pi.get((k-1,w, u), LOG_PROB_OF_ZERO) + q_values.get((w, u, v), LOG_PROB_OF_ZERO) + e_values.get((tokens[k-1], v), LOG_PROB_OF_ZERO)
+                    values = [k,u,v,w,pi.get((k-1,w, u), LOG_PROB_OF_ZERO),q_values.get((w, u, v), LOG_PROB_OF_ZERO), tokens[k-1], e_values.get((tokens[k-1], v), LOG_PROB_OF_ZERO), prob]
+                    trellis.append(values)
                     if prob > max_prob:
                         max_prob = prob
                         max_tag = w
                 pi[k, u, v] = max_prob
                 bp[k, u, v] = max_tag
-            print k, bp[k, u, v]
+
+        # Print log file
+        with open("logfile.csv", "wb") as f:
+            writer = csv.writer(f)
+            writer.writerows(trellis)
 
         # Get max of last two tokens ending in STOP
         max_prob = -float('Inf')
         for u, v in itertools.product(tagspace[n-1], tagspace[n]):
-            prob = pi.get((n, u, v), RARE_WORD_MAX_FREQ) + q_values.get((u, v, STOP_SYMBOL), RARE_WORD_MAX_FREQ)
+            prob = pi.get((n, u, v), LOG_PROB_OF_ZERO) + q_values.get((u, v, STOP_SYMBOL), LOG_PROB_OF_ZERO)
             if prob > max_prob:
                 max_prob = prob
                 max_v = v
                 max_u = u
 
+        print "Max probability is ", max_prob
         # Format tag sequence
         y = {}
         y[n] = max_v
         y[n-1] = max_u
 
-        # for k in range((n-2), -1, -1):
-        #     y[k] = bp[k+2, y[k+1], y[k+2]]
-        #     print k, y[k]
+        for k in range((n-2), 0, -1):
+             y[k] = bp[k+2, y[k+1], y[k+2]]
+        print y
 
 
 

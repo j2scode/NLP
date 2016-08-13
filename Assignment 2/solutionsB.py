@@ -247,6 +247,7 @@ def viterbi(brown_dev_words, taglist, known_words, q_values, e_values):
             i += 1
         tagged_sentence = tagged_sentence + '\n'
         tagged.append(tagged_sentence)
+        break
 
     return tagged
 
@@ -269,6 +270,18 @@ def nltk_tagger(brown_words, brown_tags, brown_dev_words):
 
     # IMPLEMENT THE REST OF THE FUNCTION HERE
     tagged = []
+    tagged_sent = []
+    t0 = nltk.DefaultTagger('NOUN')
+    t1 = nltk.BigramTagger(training, backoff= t0)
+    t2 = nltk.TrigramTagger(training, backoff= t1)
+    for sentence in brown_dev_words:
+        format_sent = ''
+        tagged_sent = t2.tag(sentence)
+        for tuple in tagged_sent:
+            format_sent = format_sent + tuple[0] + '/' + tuple[1] + ' '
+        format_sent += '\n'
+        tagged.append(format_sent)
+
     return tagged
 
 # This function takes the output of nltk_tagger() and outputs it to file
@@ -289,17 +302,13 @@ def main():
     infile = open(DATA_PATH + "Brown_tagged_train.txt", "r")
     brown_train = infile.readlines()
     infile.close()
-    print "Open Brown training data  time: " + str(time.clock()) + ' sec'
-
 
     # split words and tags, and add start and stop symbols (question 1)
     brown_words, brown_tags = split_wordtags(brown_train)
-    print "Split word tags time: " + str(time.clock()) + ' sec'
 
 
     # calculate tag trigram probabilities (question 2)
     q_values = calc_trigrams(brown_tags)
-    print "Calculate trigrams time: " + str(time.clock()) + ' sec'
 
 
     # question 2 output
@@ -307,20 +316,15 @@ def main():
 
     # calculate list of words with count > 5 (question 3)
     known_words = calc_known(brown_words)
-    print "Calculate known words time: " + str(time.clock()) + ' sec'
-
 
     # get a version of brown_words with rare words replace with '_RARE_' (question 3)
     brown_words_rare = replace_rare(brown_words, known_words)
-    print "Replace rare words time: " + str(time.clock()) + ' sec'
-
 
     # question 3 output
     q3_output(brown_words_rare, OUTPUT_PATH + "B3.txt")
 
     # calculate emission probabilities (question 4)
     e_values, taglist = calc_emission(brown_words_rare, brown_tags)
-    print "Calculate emission probabilities time: " + str(time.clock()) + ' sec'
 
     # question 4 output
     q4_output(e_values, OUTPUT_PATH + "B4.txt")
@@ -333,25 +337,20 @@ def main():
     infile = open(DATA_PATH + "Brown_dev.txt", "r")
     brown_dev = infile.readlines()
     infile.close()
-    print "Open Brown development data time: " + str(time.clock()) + ' sec'
-
 
     # format Brown development data here
     brown_dev_words = []
     for sentence in brown_dev:
         brown_dev_words.append(sentence.split(" ")[:-1])
-    print "Format Brown development data time: " + str(time.clock()) + ' sec'
 
     # do viterbi on brown_dev_words (question 5)
     viterbi_tagged = viterbi(brown_dev_words, taglist, known_words, q_values, e_values)
-    print "Run Viterbi algorithm on time: " + str(time.clock()) + ' sec'
 
     # question 5 output
     q5_output(viterbi_tagged, OUTPUT_PATH + 'B5.txt')
 
     # do nltk tagging here
     nltk_tagged = nltk_tagger(brown_words, brown_tags, brown_dev_words)
-    print "NLTK tagger time: " + str(time.clock()) + ' sec'
 
     # question 6 output
     q6_output(nltk_tagged, OUTPUT_PATH + 'B6.txt')

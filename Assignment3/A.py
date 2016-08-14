@@ -28,13 +28,14 @@ def build_s(data):
     # implement your code here
     for lexelt in data:
         cv = []
+        instances = 0
         for instance in data[lexelt]:
+            instances += 1
             tokenizer = RegexpTokenizer(r'\w+')
             left_context = tokenizer.tokenize(instance[1])
             right_context = tokenizer.tokenize(instance[3])
-            cv.append(list(set(left_context[-20:] + right_context[20:])))
-        s[lexelt] = cv
-
+            cv += left_context[-window_size:] + right_context[0:window_size]
+        s[lexelt] = list(set(cv))
     return s
 
 

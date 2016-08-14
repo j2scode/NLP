@@ -28,9 +28,7 @@ def build_s(data):
     # implement your code here
     for lexelt in data:
         cv = []
-        instances = 0
         for instance in data[lexelt]:
-            instances += 1
             tokenizer = RegexpTokenizer(r'\w+')
             left_context = tokenizer.tokenize(instance[1])
             right_context = tokenizer.tokenize(instance[3])
@@ -59,6 +57,16 @@ def vectorize(data, s):
     labels = {}
 
     # implement your code here
+    for instance in data:
+        word_count = []
+        tokenizer = RegexpTokenizer(r'\w+')
+        left_context = tokenizer.tokenize(instance[1])
+        right_context = tokenizer.tokenize(instance[3])
+        context = left_context[-window_size:] + right_context[0:window_size]
+        for word in s:
+            word_count.append(context.count(word))
+        vectors[instance[0]] = word_count
+        labels[instance[0]] = instance[4]
 
     return vectors, labels
 
@@ -117,6 +125,7 @@ def run(train, test, language, knn_file, svm_file):
         X_train, y_train = vectorize(train[lexelt], s[lexelt])
         X_test, _ = vectorize(test[lexelt], s[lexelt])
         svm_results[lexelt], knn_results[lexelt] = classify(X_train, X_test, y_train)
+        break
 
     print_results(svm_results, svm_file)
     print_results(knn_results, knn_file)

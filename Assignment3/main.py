@@ -4,6 +4,8 @@ from xml.dom import minidom
 import A
 import B
 
+
+
 def replace_accented(input_str):
     nkfd_form = unicodedata.normalize('NFKD', input_str)
     return u"".join([c for c in nkfd_form if not unicodedata.combining(c)])

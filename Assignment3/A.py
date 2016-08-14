@@ -1,6 +1,8 @@
 from main import replace_accented
 from sklearn import svm
 from sklearn import neighbors
+from nltk.tokenize import RegexpTokenizer
+
 
 # don't change the window size
 window_size = 10
@@ -24,6 +26,14 @@ def build_s(data):
     s = {}
 
     # implement your code here
+    for lexelt in data:
+        cv = []
+        for instance in data[lexelt]:
+            tokenizer = RegexpTokenizer(r'\w+')
+            left_context = tokenizer.tokenize(instance[1])
+            right_context = tokenizer.tokenize(instance[3])
+            cv.append(list(set(left_context[-20:] + right_context[20:])))
+        s[lexelt] = cv
 
     return s
 

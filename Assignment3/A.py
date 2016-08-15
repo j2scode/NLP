@@ -1,4 +1,5 @@
 import main
+import nltk
 from sklearn import svm
 from sklearn import neighbors
 from nltk.tokenize import RegexpTokenizer
@@ -21,7 +22,6 @@ def build_s(data):
 			lexelt: [w1,w2,w3, ...],
 			...
         }
-
     '''
     s = {}
 
@@ -29,9 +29,8 @@ def build_s(data):
     for lexelt in data:
         cv = []
         for instance in data[lexelt]:
-            tokenizer = RegexpTokenizer(r'\w+')
-            left_context = tokenizer.tokenize(instance[1])
-            right_context = tokenizer.tokenize(instance[3])
+            left_context = nltk.word_tokenize(instance[1])
+            right_context = nltk.word_tokenize(instance[3])
             cv += left_context[-window_size:] + right_context[0:window_size]
         s[lexelt] = list(set(cv))
     return s
@@ -51,7 +50,6 @@ def vectorize(data, s):
             }
             labels: A dictionary with the following structure
             { instance_id : sense_id }
-
     '''
     vectors = {}
     labels = {}
@@ -59,9 +57,8 @@ def vectorize(data, s):
     # implement your code here
     for instance in data:
         word_count = []
-        tokenizer = RegexpTokenizer(r'\w+')
-        left_context = tokenizer.tokenize(instance[1])
-        right_context = tokenizer.tokenize(instance[3])
+        left_context = nltk.word_tokenize(instance[1])
+        right_context = nltk.word_tokenize(instance[3])
         context = left_context[-window_size:] + right_context[0:window_size]
         for word in s:
             word_count.append(context.count(word))
@@ -75,20 +72,16 @@ def vectorize(data, s):
 def classify(X_train, X_test, y_train):
     '''
     Train two classifiers on (X_train, and y_train) then predict X_test labels
-
     :param X_train: A dictionary with the following structure
             { instance_id: [w_1 count, w_2 count, ...],
             ...
             }
-
     :param X_test: A dictionary with the following structure
             { instance_id: [w_1 count, w_2 count, ...],
             ...
             }
-
     :param y_train: A dictionary with the following structure
             { instance_id : sense_id }
-
     :return: svm_results: a list of tuples (instance_id, label) where labels are predicted by LinearSVC
              knn_results: a list of tuples (instance_id, label) where labels are predicted by KNeighborsClassifier
     '''
@@ -126,10 +119,8 @@ def classify(X_train, X_test, y_train):
 # A.3, A.4 output
 def print_results(results ,output_file):
     '''
-
     :param results: A dictionary with key = lexelt and value = a list of tuples (instance_id, label)
     :param output_file: file to write output
-
     '''
 
     # implement your code here
@@ -178,6 +169,3 @@ def run(train, test, language, knn_file, svm_file):
 
     print_results(svm_results, svm_file)
     print_results(knn_results, knn_file)
-
-
-

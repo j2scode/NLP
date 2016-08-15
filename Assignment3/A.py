@@ -1,4 +1,4 @@
-from main import replace_accented
+import main
 from sklearn import svm
 from sklearn import neighbors
 from nltk.tokenize import RegexpTokenizer
@@ -99,7 +99,27 @@ def classify(X_train, X_test, y_train):
     svm_clf = svm.LinearSVC()
     knn_clf = neighbors.KNeighborsClassifier()
 
-    # implement your code here
+    # Reformat training and test data into vectors
+    X_train_values = X_train.values()
+    y_train_values = y_train.values()
+    X_test_values = X_test.values()
+
+    # Train models
+    svm_clf.fit(X_train_values, y_train_values)
+    knn_clf.fit(X_train_values, y_train_values)
+
+    # Predict test data based upon trained models
+    svm_predictions = svm_clf.predict(X_test_values)
+    knn_predictions = knn_clf.predict(X_test_values)
+
+    # Format results into list of tuples
+    i = 0
+    for instance in X_test:
+        svm_tuple = (instance, svm_predictions[i])
+        knn_tuple = (instance, knn_predictions[i])
+        svm_results.append(svm_tuple)
+        knn_results.append(knn_tuple)
+        i += 1
 
     return svm_results, knn_results
 
@@ -115,6 +135,36 @@ def print_results(results ,output_file):
     # implement your code here
     # don't forget to remove the accent of characters using main.replace_accented(input_str)
     # you should sort results on instance_id before printing
+    output = []
+    #
+    for result in results:
+        lexelt_item = main.replace_accented(result)
+        for tuple in results[result]:
+            output_line = []
+            instance_id = main.replace_accented(tuple[0])
+            sense_id = tuple[1]
+            output_line.append(lexelt_item)
+            output_line.append(instance_id)
+            output_line.append(sense_id)
+            output.append(output_line)
+
+    # Sort Output
+    output_sorted = sorted(output, key=lambda line: ([line[0], line[1]]))
+
+    # Format output with spaces between the elements of the list
+    output_print = []
+    for output in output_sorted:
+        output_format = output[0] + ' ' + output[1] + ' ' + output[2]
+        output_print.append(output_format)
+
+    # Write results to file
+    outfile = open(output_file, 'w')
+    for output in output_print:
+        try:
+            outfile.write(output + '\n')
+        except:
+            print 'unicode error for', output
+    outfile.close()
 
 # run part A
 def run(train, test, language, knn_file, svm_file):
@@ -125,7 +175,6 @@ def run(train, test, language, knn_file, svm_file):
         X_train, y_train = vectorize(train[lexelt], s[lexelt])
         X_test, _ = vectorize(test[lexelt], s[lexelt])
         svm_results[lexelt], knn_results[lexelt] = classify(X_train, X_test, y_train)
-        break
 
     print_results(svm_results, svm_file)
     print_results(knn_results, knn_file)

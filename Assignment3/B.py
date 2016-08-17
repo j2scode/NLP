@@ -4,7 +4,8 @@ import nltk
 from nltk.tokenize import RegexpTokenizer
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
-from nltk import pos_tag
+from nltk import pos_tag, word_tokenize
+from nltk.util import ngrams
 
 
 
@@ -22,6 +23,34 @@ def merge_dicts(*dict_args):
     for dictionary in dict_args:
         result.update(dictionary)
     return result
+
+def extract_local_context(left, right):
+    '''
+    Given a left and right context, formatted as a list of items (words or pos), returns a dictionary of including
+    the item, it's position from the ambiguous word
+    :param left:
+    :param right:
+    :return feature list:  a list of tuples of the form [(item1, position1), (item2, position2)..]
+    '''
+
+    local_context = []
+    position = 0
+
+    # Format left context
+    for i in range(len(left) - 1, (len(left) - 1) - local_context_size, -1):
+        item = left[i]
+        position = position - 1
+        local_context.append((item, position))
+        if position == -(window_size):
+            break
+    # Format right context
+    for i in range(local_context_size):
+        item = right[i]
+        position = i + 1
+        local_context.append((item, position))
+
+    return local_context
+
 
 # B.1.a,b,c,d
 def extract_features(data):
@@ -46,53 +75,84 @@ def extract_features(data):
         F1: Unordered content words in the large context
         F2: A set of words assigned with their positions in the local context
         F3: A set of parts-of-speech tags assigned with their positions in the local context
-        F4: A set of unigram, bigram, and trigram collocations
-        F5: A set of unigram, bigram, and trigram collocations of parts-of-speech
+        F4: A set of bigram, and trigram collocations
+        F5: A set of bigram, and trigram collocations of parts-of-speech
 
     Note: Stopwords, punctuation, and numbers are removed.  Words are lemmatized and lower-case.
     '''
 
     for instance in data:
 
+        # Prepare left and right contexts, free of stopwords and lemmatized, with pos tags
+        text = instance[1] + instance[2] + instance[3]                      # Combine text to include the head
+        tokenizer = RegexpTokenizer(r'\w+')                                 # Remove punctuation
+        tokens = tokenizer.tokenize(text)
+        head_marker = len(tokenizer.tokenize(instance[1]))
+        tokens_pos = pos_tag(tokens)                                        # Create POS tags and lemmatize
+        wnl = WordNetLemmatizer()
+        tokens_lemma = [wnl.lemmatize(i, j[0].lower()) if j[0].lower() in ['a', 'n', 'v'] else wnl.lemmatize(i)
+                        for i, j in tokens_pos]
+        left_context_pos = tokens_pos[0:head_marker]                   # Split POS and Lemma into left and right
+        right_context_pos = tokens_pos[head_marker + 1:]               # Contexts
+        left_context_lemma = tokens_lemma[0:head_marker]
+        right_context_lemma = tokens_lemma[head_marker + 1:]
+
         # Feature Set 1: Unordered Content Words in Large Context
         feature_dict_1 = {}
-        tokenizer = RegexpTokenizer(r'\w+')
-        left_context = tokenizer.tokenize(instance[1])
-        right_context = tokenizer.tokenize(instance[3])
-        stopwords = nltk.corpus.stopwords.words('english')
-        left_context = [w for w in left_context if w not in stopwords]
-        right_context = [w for w in right_context if w not in stopwords]
-        left_context = left_context[-window_size:]
-        right_context = right_context[0:window_size]
-        wnl = WordNetLemmatizer()
-        left_context = [wnl.lemmatize(i, j[0].lower()) if j[0].lower() in ['a', 'n', 'v'] else wnl.lemmatize(i)
-                        for i, j in pos_tag(left_context)]
-        right_context = [wnl.lemmatize(i, j[0].lower()) if j[0].lower() in ['a', 'n', 'v'] else wnl.lemmatize(i)
-                         for i, j in pos_tag(right_context)]
-        context = left_context + right_context
+        context = left_context_lemma + right_context_lemma
         context_set = set(context)
-        feature_dict_1 = {word : context.count(word) for word in context_set}
+        feature_dict_1 = {word: context.count(word) for word in context_set}
 
         # Feature Set 2: A set of words assigned with their positions in the local context
         feature_dict_2 = {}
-        feature_list = []
-        print 'PRINTING LEFT CONTEXT'
-        print left_context
-        position = 0
-        for i in range(len(left_context)-1, (len(left_context)-1) - local_context_size, -1):
-            word = left_context[i]
-            position = position - 1
-            feature_list.append((word, position))
-            if position == -(window_size):
-                break
-        print '\n', 'PRINTING RIGHT CONTEXT'
-        print right_context
-        for i in range(local_context_size):
-            word = right_context[i]
-            position = i + 1
-            feature_list.append((word, position))
-        feature_dict_2 = {key : feature_list.count(key) for key in feature_list}
-        print feature_dict_2
+        local_context_words = extract_local_context(left_context_lemma, right_context_lemma)
+        feature_dict_2 = {key: 1 for key in local_context_words}
+
+        # Features Set 3: A set of parts-of-speech tags assigned with their positions in the local context
+        feature_dict_3 = {}
+        left_context_pos_list = [key[1] for key in left_context_pos]
+        right_context_pos_list = [key[1] for key in right_context_pos]
+        local_context_pos = extract_local_context(left_context_pos_list, right_context_pos_list)
+        feature_dict_3 = {key: 1 for key in local_context_pos}
+
+        # Feature Set 4: A set of bigram, and trigram collocations within the collocation window
+        feature_dict_4 = {}
+        left_marker = head_marker - collocation_size
+        right_marker = head_marker + collocation_size
+        local_context_head_word = tokens[left_marker:right_marker + 1]
+        fourgrams = ngrams(local_context_head_word, 4)
+        trigrams = nltk.trigrams(local_context_head_word[1:len(local_context_head_word)-1])
+        bigrams = nltk.bigrams(local_context_head_word[2:len(local_context_head_word)-2])
+        freq_bigrams = nltk.FreqDist(bigrams)
+        freq_trigrams = nltk.FreqDist(trigrams)
+        freq_fourgrams = nltk.FreqDist(fourgrams)
+        for k, v in freq_bigrams.iteritems():
+            feature_dict_4[k] = v
+        for k, v in freq_trigrams.iteritems():
+            feature_dict_4[k] = v
+        for k, v in freq_fourgrams.iteritems():
+            feature_dict_4[k] = v
+
+        # Feature Set 5: A set of bigram, and trigram collocations of parts-of-speech
+        feature_dict_5 = {}
+        left_context_pos_list = left_context_pos_list[left_marker:head_marker]
+        right_context_pos_list = right_context_pos_list[0:collocation_size]
+        left_context_pos_list.append(instance[2])
+        local_context_head_pos = left_context_pos_list + right_context_pos_list
+        fourgrams = ngrams(local_context_head_pos , 4)
+        trigrams = nltk.trigrams(local_context_head_pos[1:len(local_context_head_pos)-1])
+        bigrams = nltk.bigrams(local_context_head_pos[2:len(local_context_head_pos)-2])
+        freq_bigrams = nltk.FreqDist(bigrams)
+        freq_trigrams = nltk.FreqDist(trigrams)
+        freq_fourgrams = nltk.FreqDist(fourgrams)
+        for k, v in freq_bigrams.iteritems():
+            feature_dict_5[k] = v
+        for k, v in freq_trigrams.iteritems():
+            feature_dict_5[k] = v
+        for k, v in freq_fourgrams.iteritems():
+            feature_dict_5[k] = v
+        for i in feature_dict_5:
+            print i, feature_dict_5[i]
 
         labels[instance[0]] = instance[4]
 

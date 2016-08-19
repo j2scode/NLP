@@ -151,13 +151,12 @@ def extract_features(data):
             feature_dict_5[k] = v
         for k, v in freq_fourgrams.iteritems():
             feature_dict_5[k] = v
-        for i in feature_dict_5:
-            print i, feature_dict_5[i]
 
         labels[instance[0]] = instance[4]
 
-        #features = merge_dicts(feature_dict_1, feature_dict_2)
+        features[instance[0]] = merge_dicts(feature_dict_1, feature_dict_2, feature_dict_3, feature_dict_4, feature_dict_5)
 
+        print features
         break
 
     return features, labels

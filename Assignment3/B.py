@@ -6,11 +6,13 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk import pos_tag, word_tokenize
 from nltk.util import ngrams
+import math
+from collections import defaultdict
 
 
 
 # You might change the window size
-window_size = 50
+window_size = 20
 local_context_size = 3
 collocation_size = 3
 
@@ -37,7 +39,9 @@ def extract_local_context(left, right):
     position = 0
 
     # Format left context
-    for i in range(len(left) - 1, (len(left) - 1) - local_context_size, -1):
+    start = len(left) - 1
+    stop = max(0, start - local_context_size)
+    for i in range(start, stop, -1):
         item = left[i]
         position = position - 1
         local_context.append((item, position))
@@ -81,9 +85,11 @@ def extract_features(data):
     Note: Stopwords, punctuation, and numbers are removed.  Words are lemmatized and lower-case.
     '''
 
+    ns_c = defaultdict(dict)
+    n_c = defaultdict(dict)
     for instance in data:
 
-        # Prepare left and right contexts, free of stopwords and lemmatized, with pos tags
+        # Prepare left and right contexts, free of punctuation and lemmatized, with pos tags
         text = instance[1] + instance[2] + instance[3]                      # Combine text to include the head
         tokenizer = RegexpTokenizer(r'\w+')                                 # Remove punctuation
         tokens = tokenizer.tokenize(text)
@@ -152,12 +158,38 @@ def extract_features(data):
         for k, v in freq_fourgrams.iteritems():
             feature_dict_5[k] = v
 
+        # Feature Set 6: Create data structure used to calculate relevance scores for feature 6
+        if instance[4] != '':
+            large_context = left_context_lemma[-window_size:] + right_context_lemma[:window_size]
+            large_context_nonstop = [word for word in large_context if word not in stopwords.words('english')]
+            large_context_nonstop_set = set(large_context_nonstop)
+            for c in large_context_nonstop_set:
+                if c in n_c:
+                    n_c[c] += 1
+                else:
+                    n_c[c] = 1
+                key = (instance[4], c)
+                if key in ns_c:
+                    ns_c[key] += 1
+                else:
+                    ns_c[key] = 1
+
         labels[instance[0]] = instance[4]
 
         features[instance[0]] = merge_dicts(feature_dict_1, feature_dict_2, feature_dict_3, feature_dict_4, feature_dict_5)
 
-        print features
-        break
+    # Feature Set 6: Calculate relevance scores
+    relevance = []
+    for k in ns_c:
+        s = k[0]
+        c = k[1]
+        print 'key is', k, 'sense is', s, 'word is', c, 'ns_c is', ns_c[k], 'n_c is', n_c[c]
+        prob_s_c = ns_c[k] / float(n_c[c])
+        prob_s_not_c = 1 - prob_s_c
+        rel = math.log(prob_s_c / float(prob_s_not_c, 2)
+        relevance.append([s, c, rel])
+
+    print relevance
 
     return features, labels
 
